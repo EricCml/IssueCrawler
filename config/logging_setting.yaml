@@ -1,0 +1,99 @@
+version: 1
+# 将信息传播到配置文件的根日志记录器中
+disable_existing_loggers: False
+
+# 配置日志格式化输出时的样式
+formatters:
+  simple:
+    format: "%(asctime)s - %(name)s - %(levelname)s: %(message)s"
+  standard:
+    format: "%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s"
+  error:
+    format: "%(asctime)s - <PID %(process)d:%(processName)s> - %(filename)s.%(funcName)s()[line:%(lineno)d] - %(levelname)s: %(message)s"
+
+filters:
+  debugFilter:
+    (): util.setup_logging.DebugFilter
+  infoFilter:
+    (): util.setup_logging.InfoFilter
+  errorFilter:
+    (): util.setup_logging.ErrorFilter
+  warningFilter:
+    (): util.setup_logging.WarningFilter
+  criticalFilter:
+    (): util.setup_logging.CriticalFilter
+
+# 配置需要处理的日志信息
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: standard
+    stream: ext://sys.stdout
+
+  debug_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: standard
+    filename: ../log/debug.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+  info_file_handler:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: INFO
+    formatter: standard
+    filename: ../log/info.log
+    when: 'H'
+    backupCount: 20
+    utc: False
+    filters: [ infoFilter ]
+    encoding: utf8
+
+  warn_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: WARN
+    formatter: standard
+    filename: ../log/warn.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    filters: [ warningFilter ]
+    encoding: utf8
+
+  error_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: error
+    filename: ../log/errors.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    filters: [ errorFilter ]
+    encoding: utf8
+
+  critical_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: CRITICAL
+    formatter: standard
+    filename: ../log/critical.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    filters: [ criticalFilter ]
+    encoding: utf8
+
+root:
+  level: NOTSET
+  handlers: [ console ]
+  propogate: yes
+
+loggers:
+  mainModule:
+    level: INFO
+    handlers: [ info_file_handler, warn_file_handler ,error_file_handler, critical_file_handler ]
+    propogate: no
+
+  mainModule.subModule:
+    level: ERROR
+    handlers: [ info_file_handler, warn_file_handler ,error_file_handler, critical_file_handler ]
+    propogate: no
+
