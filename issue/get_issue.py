@@ -151,9 +151,9 @@ def get_downloaded_issue_list():
     获取数据库已有的issue编号
     :return: 返回数据库已有的issue编号列表
     """
-    already_issue_number = []
-    for i in collection.find({}, {'number': 1, '_id': 0}):
-        already_issue_number.append(i['number'])
+    # distinct(key, filter=None, session=None, **kwargs)
+    # 获取此集合中所有文档中key的不同值的列表。
+    already_issue_number = collection.distinct('number')
     return already_issue_number
 
 
